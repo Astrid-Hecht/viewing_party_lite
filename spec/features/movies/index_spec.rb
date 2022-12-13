@@ -34,25 +34,36 @@ RSpec.describe 'the User Movie Index Page', :vcr do
           end
         end
       end
-    end
 
-    it 'has pagination' do
-      pg1_first_movie = { title: first.find('.title'), rating: first.find('.rating') }
+      it 'has pagination' do
+        within '#movie-table' do
+          first = page.find('.movie', match: :first)
+          first_id = first[:id]
+          first_rating = first.find('.rating').text
+          @page_1_first_movie = { id: first_id, rating: first_rating }
+        end
 
-      within '.result-pagination' do
-        expect(page).to have_content('1')
-        expect(page).to have_button('>>>')
+        within '.result-pagination' do
+          expect(page).to have_content('1')
+          expect(page).to have_button('>>>')
 
-        click_on '>>>'
-      end
+          click_on '>>>'
+        end
 
-      pg2_first_movie = { title: first.find('.title'), rating: first.find('.rating') }
+        within '#movie-table' do
+          first = page.find('.movie', match: :first)
+          first_id = first[:id]
+          first_rating = first.find('.rating').text
+          @page_2_first_movie = { id: first_id, rating: first_rating }
+        end
 
-      expect(pg2_first_movie[:title]).not_to eq(pg1_first_movie[:title])
-      expect(pg2_first_movie[:rating]).to be <= (pg1_first_movie[:rating])
-      within '.result-pagination' do
-        expect(page).to have_content('2')
-        expect(page).to have_button('>>>')
+        expect(@page_2_first_movie[:id]).not_to eq(@page_1_first_movie[:id])
+        expect(@page_2_first_movie[:rating].to_f).to be <= (@page_1_first_movie[:rating].to_f)
+
+        within '.result-pagination' do
+          expect(page).to have_content('2')
+          expect(page).to have_button('>>>')
+        end
       end
     end
 
