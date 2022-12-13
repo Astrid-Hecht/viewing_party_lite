@@ -1,8 +1,8 @@
 <%=content_for :subtitle do%>
-  <h3><%= @subtitle %></h3>
+  <h3><%=@subtitle%></h3>
 <%end%>
-
 <%= render 'partials/discover_button'%>
+
 
 <table id='movie-table' class='center'>
   <tr>
@@ -19,6 +19,12 @@
     </td>
   </tr>
   <%end%>
-
-    
 </table>
+<div class='container center'>
+  <div class='result-pagination'>
+    <%= button_to '<<<', user_movies_path(@user), method: :get, params: {q: @params[:q], page: @params[:page].to_i - 1}, :disabled => @params[:page].to_i == 1%>
+    <%= @params[:page] %> 
+    <%= button_to '>>>', user_movies_path(@user), method: :get, params: {q: @params[:q], page: @params[:page].to_i + 1}%>
+  </div>
+</div>
+

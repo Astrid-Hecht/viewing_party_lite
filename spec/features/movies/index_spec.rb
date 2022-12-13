@@ -2,7 +2,7 @@ require 'rails_helper'
 require 'date'
 
 RSpec.describe 'the User Movie Index Page', :vcr do
-  let!(:user) { create(:user)}
+  let!(:user) { create(:user) }
 
   before(:each) { visit discover_path(user) }
 
@@ -36,9 +36,29 @@ RSpec.describe 'the User Movie Index Page', :vcr do
       end
     end
 
+    it 'has pagination' do
+      pg1_first_movie = { title: first.find('.title'), rating: first.find('.rating') }
+
+      within '.result-pagination' do
+        expect(page).to have_content('1')
+        expect(page).to have_button('>>>')
+
+        click_on '>>>'
+      end
+
+      pg2_first_movie = { title: first.find('.title'), rating: first.find('.rating') }
+
+      expect(pg2_first_movie[:title]).not_to eq(pg1_first_movie[:title])
+      expect(pg2_first_movie[:rating]).to be <= (pg1_first_movie[:rating])
+      within '.result-pagination' do
+        expect(page).to have_content('2')
+        expect(page).to have_button('>>>')
+      end
+    end
+
     describe 'when the search button is clicked but the field is empty' do
-      before(:each) {click_button 'Search'}
-      
+      before(:each) { click_button 'Search' }
+
       it 'takes you to movie index with a param of q thats empty, but still shows top rated' do
         expect(page).to have_content("Top Rated Movies")
         expect(page).to_not have_content("Movie results for:")
@@ -52,7 +72,7 @@ RSpec.describe 'the User Movie Index Page', :vcr do
         fill_in 'q', with: 'Abyss'
         click_button 'Search'
       end
-      
+
       it 'takes you to movie index with a param of q that equals the search term' do
         expect(page).to have_content("Movie results for: 'Abyss'")
       end
